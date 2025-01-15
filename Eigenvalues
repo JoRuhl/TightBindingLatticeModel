@@ -1,0 +1,53 @@
+#get the needed libraries
+import numpy as np
+import scipy.linalg as la
+from scipy.sparse import diags
+
+#numerically solve the system, and output the index of the desired eigenvalues
+
+#set lattice boundaries for truncated system
+right = 30
+left = -31
+
+gamma = -np.log(3) #value of the hopping constant.
+
+latticepts = np.arange(left,right+1,1) #create the vector of lattice points.
+
+#make the main diagonals for the matrix
+maindiag = np.zeros(len(latticepts)-1)
+
+uldiag = np.empty(right-left-1)
+
+for i in range(len(uldiag)):
+  uldiag[i]= np.exp(gamma*(latticepts[i+1]))
+
+
+#compose the matrix
+matrix = diags([maindiag,uldiag,uldiag],[0,1,-1]).toarray()
+
+if np.allclose(matrix,np.transpose(matrix)) == False: #make sure matrix is symmetric
+  print('This matrix is not symmetric')
+
+
+#get the eigenvalues and eigenvectors and write them to arrays
+eigenvals,eigenvecs = la.eig(matrix)
+
+interjection = ''
+#scan eigenvalues for imaginary parts
+for i in range(len(eigenvals)):
+  if np.imag(eigenvals[i]) > 1e-16:
+    print("The",i,"-th eigenvalue is complex. The value is", eigenvals[i])
+    interjection='other'
+
+print('All',interjection,'eigenvalues are real')
+
+Real_eigenvals = np.real(eigenvals) #discard the imaginary parts, which are zero
+
+#scan for eigenvalues in the desired range
+for j in range(len(Real_eigenvals)): 
+  if Real_eigenvals[j] >0.5 and Real_eigenvals[j]<2:
+    print('The',j,'-th eigenvalue is',Real_eigenvals[j])
+
+for k in range(len(Real_eigenvals)):
+  if Real_eigenvals[k] < -0.5 and Real_eigenvals[k]> -2:
+    print('The',k,'-th eigenvalue is',Real_eigenvals[k])
