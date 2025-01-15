@@ -1,0 +1,1 @@
+This code calculates eigenvalues and eigenvectors from the Jacobi matrix arising from truncating the lattice of the tight binding model described in https://arxiv.org/pdf/2410.13988. Additionally, you can scan positive and negative eigenvalues to check for a particular value if desired.
